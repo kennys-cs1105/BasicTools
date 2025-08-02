@@ -7,7 +7,7 @@
 
 ## File Info
 
-### multigpu.py
+### multigpu
 
 1. 安装Pytorch Lightning
 2. 基于pl构建dataloader
