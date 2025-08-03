@@ -20,7 +20,7 @@ class multi_head_attention(nn.Module):
         self.w_combine = nn.Linear(d_model, d_model)
         self.softmax = nn.Softmax(dim=-1)
         
-    def forward(self, q, k, v):
+    def forward(self, q, k, v, mask=None):
         batch, time, dimension = q.shape
         n_d = self.d_model // self.n_head
         q, k, v = self.w_q(q), self.w_k(k), self.w_v(v)
@@ -31,8 +31,10 @@ class multi_head_attention(nn.Module):
         v = v.view(batch, time, self.n_head, n_d).permute(0, 2, 1, 3)  
         
         score = q @ k.transpose(2, 3) / math.sqrt(n_d)
-        mask = torch.tril(torch.ones(time, time, dtype=bool)) # torch.tril: 下三角矩阵
-        score = score.masked_fill(mask == 0, float("-inf")) # 等于0的地方用负无穷表示
+
+        if mask is not None:
+            mask = torch.tril(torch.ones(time, time, dtype=bool)) # torch.tril: 下三角矩阵
+            score = score.masked_fill(mask == 0, float("-inf")) # 等于0的地方用负无穷表示
         score = self.softmax(score) @ v
 
         score = score.permute(0, 2, 1, 3).contiguous().view(batch, time, dimension)
