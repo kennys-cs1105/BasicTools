@@ -33,7 +33,7 @@ class multi_head_attention(nn.Module):
         score = q @ k.transpose(2, 3) / math.sqrt(n_d)
 
         if mask is not None:
-            mask = torch.tril(torch.ones(time, time, dtype=bool)) # torch.tril: 下三角矩阵
+            # mask = torch.tril(torch.ones(time, time, dtype=bool)) # torch.tril: 下三角矩阵
             score = score.masked_fill(mask == 0, float("-inf")) # 等于0的地方用负无穷表示
         score = self.softmax(score) @ v
 
